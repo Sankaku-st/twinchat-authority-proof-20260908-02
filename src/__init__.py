@@ -1,0 +1,1 @@
+"""Synthetic authority verification tools."""
