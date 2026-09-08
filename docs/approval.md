@@ -1,0 +1,1 @@
+# Synthetic approval fixture
