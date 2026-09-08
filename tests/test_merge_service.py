@@ -16,6 +16,67 @@ class Client:
         return {"merged": True}
 
 
+class SnapshotClient:
+    def __init__(self):
+        self.reviews = []
+
+    def pull(self, number):
+        return {"state": "open", "draft": False, "base": {"ref": "develop"},
+                "head": {"sha": "a" * 40}, "changed_files": 1}
+
+    def require(self, method, route):
+        if route == "/issues/1":
+            return {"title": "fixture", "body": "fixed request", "updated_at": "fixed", "state": "open"}
+        if route == "/pulls/1/reviews?per_page=100":
+            return self.reviews
+        if route == "/pulls/1/files?per_page=100":
+            return [{"filename": "docs/example.md"}]
+        raise AssertionError(route)
+
+    def checks(self, sha):
+        return [{"id": 1, "name": "proof-integration", "app": {"id": 15368},
+                 "status": "completed", "conclusion": "success"}]
+
+    def head(self):
+        return "b" * 40
+
+    def review(self, user_id, state):
+        self.reviews.append({"id": len(self.reviews) + 1, "user": {
+            "id": user_id, "login": "reviewer[bot]" if user_id == 20 else "owner"},
+            "state": state, "commit_id": "a" * 40})
+
+
+class ReviewHistoryTest(unittest.TestCase):
+    def setUp(self):
+        self.client = SnapshotClient()
+        self.service = MergeService(self.client, None, None, 20, "reviewer[bot]", 30)
+        self.authority = {"issue": 1, "level": "L2", "allowed_paths": ["docs/example.md"]}
+
+    def snapshot(self):
+        return self.service.snapshot(1, self.authority)
+
+    def test_human_comments_preserve_formal_change_request_and_approval(self):
+        self.client.review(30, "CHANGES_REQUESTED")
+        self.client.review(30, "COMMENTED")
+        self.assertTrue(self.snapshot()["hold"])
+        self.client.review(30, "APPROVED")
+        self.client.review(30, "COMMENTED")
+        self.assertFalse(self.snapshot()["hold"])
+        self.assertEqual(self.snapshot()["approval"]["state"], "APPROVED")
+
+    def test_evaluator_comment_cannot_resolve_requested_changes(self):
+        self.client.review(20, "CHANGES_REQUESTED")
+        self.client.review(20, "COMMENTED")
+        self.assertFalse(self.snapshot()["evaluation_passed"])
+        self.client.review(20, "APPROVED")
+        self.client.review(20, "COMMENTED")
+        self.assertTrue(self.snapshot()["evaluation_passed"])
+
+    def test_comment_without_prior_change_request_can_accompany_signed_evaluation(self):
+        self.client.review(20, "COMMENTED")
+        self.assertTrue(self.snapshot()["evaluation_passed"])
+
+
 class MergeBoundaryTest(unittest.TestCase):
     def test_every_rejected_condition_prevents_the_external_write(self):
         with tempfile.TemporaryDirectory() as directory:
