@@ -27,11 +27,17 @@ class MergeService:
         if len(reviews) >= 100 or len(files) >= 100 or len(files) != pull["changed_files"]:
             raise MergeBlocked("Incomplete fixture input collection")
         latest = {}
+        decisions = {}
         for review in sorted(reviews, key=lambda item: item["id"]):
             latest[review["user"]["id"]] = review
-        human = latest.get(self.approver_id)
+            # A conversational comment cannot grant or revoke formal approval.
+            if review["state"] in ("APPROVED", "CHANGES_REQUESTED", "DISMISSED"):
+                decisions[review["user"]["id"]] = review
+        human = decisions.get(self.approver_id)
         evaluation = next((item for item in latest.values()
                            if item["user"]["login"] == self.evaluator_login), None)
+        evaluator_decision = None if not evaluation else decisions.get(evaluation["user"]["id"])
+        evaluator_blocked = bool(evaluator_decision and evaluator_decision["state"] in ("CHANGES_REQUESTED", "DISMISSED"))
         checks = self.client.checks(pull["head"]["sha"])
         matching = [check for check in checks if check["name"] == "proof-integration" and check["app"]["id"] == 15368]
         current_check = max(matching, key=lambda item: item["id"], default=None)
@@ -44,7 +50,7 @@ class MergeService:
             "request_digest": digest({"title": issue["title"], "body": issue["body"], "updated_at": issue["updated_at"]}),
             "policy_digest": digest(authority),
             "checks_passed": bool(current_check and current_check["status"] == "completed" and current_check["conclusion"] == "success"),
-            "evaluation_passed": bool(evaluation and evaluation["state"] in ("APPROVED", "COMMENTED") and evaluation["commit_id"] == head),
+            "evaluation_passed": bool(evaluation and not evaluator_blocked and evaluation["state"] in ("APPROVED", "COMMENTED") and evaluation["commit_id"] == head),
             "paths_allowed": bool(paths) and all(path in allowed for path in paths),
             "hold": authority.get("hold", False) or bool(human and human["state"] in ("CHANGES_REQUESTED", "DISMISSED")),
             "revoked": authority.get("revoked", False) or issue["state"] != "open",
