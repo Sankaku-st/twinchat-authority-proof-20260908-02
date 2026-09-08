@@ -1,0 +1,8 @@
+.local/
+evidence/
+__pycache__/
+*.pyc
+request.txt
+quality-spec.json
+issue-body.md
+.agent-*
