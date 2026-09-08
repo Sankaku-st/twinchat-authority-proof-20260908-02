@@ -393,31 +393,71 @@ class Suite:
         self.record("replacement-merges-with-real-check-and-no-human-approval", merged["merged"] and self.merger.pull(pull["number"])["merged"],
                     check=check, merged_sha=merged["sha"], pull=pull["url"])
 
+    def owner_candidate(self, tree, parents, suffix):
+        """Check an explicit noreply merge candidate without exposing account email."""
+        candidate = self.owner.require("POST", "/git/commits", {
+            "message": "Synthetic owner " + suffix + "; Refs #1",
+            "tree": tree, "parents": parents, "author": AUTHOR, "committer": AUTHOR,
+        })["sha"]
+        branch = f"proof/{self.run_id}-owner-{suffix}"
+        self.owner.branch(branch, candidate)
+        self.owner.require("POST", "/actions/workflows/proof.yml/dispatches", {"ref": branch})
+        deadline = time.monotonic() + 180
+        while time.monotonic() < deadline:
+            checks = [check for check in self.owner.checks(candidate)
+                      if check["name"] == "proof-integration" and check["app"]["id"] == 15368
+                      and check["status"] == "completed"]
+            if checks:
+                if checks[0]["conclusion"] != "success":
+                    raise RuntimeError("Owner candidate integration check failed")
+                return candidate, {"sha": candidate, "check_id": checks[0]["id"],
+                                   "issuer": 15368, "conclusion": "success"}
+            time.sleep(4)
+        raise TimeoutError("Owner candidate integration check timed out")
+
     def fixed_owner_exception(self):
         pull = self.pull("owner", "docs/owner.md", "# Synthetic owner-authored fixture\n", author=self.owner)
         actual = self.owner.pull(pull["number"])
-        self.record("owner-exception-uses-actual-owner-author", actual["user"]["id"] == APPROVER_ID, author_id=actual["user"]["id"])
-        check = self.dev.wait_check(pull["number"])
+        self.record("owner-exception-uses-actual-owner-author", actual["user"]["id"] == APPROVER_ID,
+                    author_id=actual["user"]["id"])
+        self.dev.wait_check(pull["number"])
         self.review(pull, event="COMMENT")
-        query = """mutation($id:ID!, $head:GitObjectID!, $email:String!) {
-            mergePullRequest(input:{pullRequestId:$id, expectedHeadOid:$head,
-              mergeMethod:MERGE, authorEmail:$email, commitHeadline:"Synthetic owner exception; Refs #1"}) {
-                pullRequest { merged mergeCommit { oid author { email } committer { email } } }
-            }
-        }"""
-        body = {"query": query, "variables": {"id": actual["node_id"], "head": actual["head"]["sha"], "email": AUTHOR["email"]}}
-        response = subprocess.run(["gh", "api", "graphql", "--method", "POST", "--input", "-"],
-                                  input=json.dumps(body), text=True, capture_output=True, timeout=40, check=True)
-        data = json.loads(response.stdout)
-        if data.get("errors"):
-            raise RuntimeError("Owner exception GraphQL merge was rejected")
-        result = data["data"]["mergePullRequest"]["pullRequest"]
-        after = self.merger.pull(pull["number"])
-        self.record("fixed-owner-self-merge-exception", result["merged"] and after["merged"] and after["merge_commit_sha"] == self.merger.head(),
-                    actor_id=APPROVER_ID, head=actual["head"]["sha"], merged_sha=after["merge_commit_sha"], check=check, pull=pull["url"])
-        self.record("owner-merge-preserves-noreply-author", result["mergeCommit"]["author"]["email"] == AUTHOR["email"],
-                    author_is_noreply=result["mergeCommit"]["author"]["email"].endswith("@users.noreply.github.com"),
-                    committer_is_noreply="noreply" in result["mergeCommit"]["committer"]["email"])
+        actual = self.owner.pull(pull["number"])
+        prepared = self.owner.require("GET", "/git/commits/" + actual["merge_commit_sha"])
+        parents = [parent["sha"] for parent in prepared["parents"]]
+        base = self.owner.head()
+        if set(parents) != {base, actual["head"]["sha"]}:
+            raise RuntimeError("Owner merge candidate does not contain the current base and head")
+        base_tree = self.owner.require("GET", "/git/commits/" + base)["tree"]["sha"]
+        if base_tree == prepared["tree"]["sha"]:
+            raise RuntimeError("Owner fixture must produce a real tree change")
+        # Even the fixed owner may not replace GitHub's prepared PR content.
+        wrong, wrong_check = self.owner_candidate(base_tree, parents, "wrong-tree")
+        denied = self.owner.request("PATCH", "/git/refs/heads/develop", {"sha": wrong, "force": False})
+        self.record("owner-altered-merge-tree-denied", denied.status == 422
+                    and "pull request" in denied.data.get("message", "").lower()
+                    and self.owner.head() == base and not self.owner.pull(pull["number"])["merged"],
+                    http=denied.status, reason=denied.data.get("message"), check=wrong_check,
+                    before=base, after=self.owner.head(), pull=pull["url"])
+        candidate, check = self.owner_candidate(prepared["tree"]["sha"], parents, "exact-tree")
+        if self.owner.head() != base or self.owner.pull(pull["number"])["head"]["sha"] != actual["head"]["sha"]:
+            raise RuntimeError("Owner PR changed during candidate verification")
+        response = self.owner.request("PATCH", "/git/refs/heads/develop", {"sha": candidate, "force": False})
+        # The mutation is sent once. Readback resolves whether GitHub accepted it.
+        deadline = time.monotonic() + 30
+        after = self.owner.pull(pull["number"])
+        while response.status == 200 and not after["merged"] and time.monotonic() < deadline:
+            time.sleep(2)
+            after = self.owner.pull(pull["number"])
+        self.record("fixed-owner-self-merge-exception", response.status == 200 and after["merged"]
+                    and after["merge_commit_sha"] == candidate and self.owner.head() == candidate,
+                    actor_id=APPROVER_ID, head=actual["head"]["sha"], merged_sha=candidate,
+                    check=check, pull=pull["url"])
+        commit = self.owner.require("GET", "/git/commits/" + candidate)
+        self.record("owner-merge-preserves-noreply-author",
+                    commit["author"]["email"] == AUTHOR["email"] and commit["committer"]["email"] == AUTHOR["email"],
+                    author_is_noreply=commit["author"]["email"].endswith("@users.noreply.github.com"),
+                    committer_is_noreply=commit["committer"]["email"].endswith("@users.noreply.github.com"))
 
     def comments_preserve_change_requests(self):
         pull = self.pull("review-history", "docs/review-history.md", "# Review state fixture\n")

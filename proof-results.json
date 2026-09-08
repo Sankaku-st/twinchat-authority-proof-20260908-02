@@ -1,0 +1,547 @@
+{
+  "scope": "Synthetic GitHub repository only; not Twin-chat production or autonomous semantic review",
+  "tested_source_commit": "9c8df8f200f0e998f52b22ddcd4cfa1855aaba6d",
+  "source_sha256": "8612159b7af8592cc5c30394b926501b7a96efa6087910e6569e1f808221acb7",
+  "run_id": "1788882984",
+  "live_assertions": 64,
+  "unit_tests": 14,
+  "status": "passed",
+  "results": [
+    {
+      "case": "roles-branch-write",
+      "status": "passed",
+      "actor": "app:4873210",
+      "http": 200,
+      "branch": "proof/1788882984-roles"
+    },
+    {
+      "case": "evaluator-cannot-write-code",
+      "status": "passed",
+      "actor": "app:4873223",
+      "http": 403,
+      "before": "b215ca57c5071c7a726f6bf034e201ac51009cd9",
+      "after": "b215ca57c5071c7a726f6bf034e201ac51009cd9"
+    },
+    {
+      "case": "developer-cannot-administer",
+      "status": "passed",
+      "actor": "app:4873210",
+      "http": 403
+    },
+    {
+      "case": "developer-cannot-forge-status",
+      "status": "passed",
+      "actor": "app:4873210",
+      "http": 403
+    },
+    {
+      "case": "developer-cannot-forge-check",
+      "status": "passed",
+      "actor": "app:4873210",
+      "http": 403
+    },
+    {
+      "case": "evaluator-cannot-administer",
+      "status": "passed",
+      "actor": "app:4873223",
+      "http": 403
+    },
+    {
+      "case": "evaluator-cannot-forge-status",
+      "status": "passed",
+      "actor": "app:4873223",
+      "http": 403
+    },
+    {
+      "case": "evaluator-cannot-forge-check",
+      "status": "passed",
+      "actor": "app:4873223",
+      "http": 403
+    },
+    {
+      "case": "merger-cannot-administer",
+      "status": "passed",
+      "actor": "app:4873237",
+      "http": 403
+    },
+    {
+      "case": "merger-cannot-forge-status",
+      "status": "passed",
+      "actor": "app:4873237",
+      "http": 403
+    },
+    {
+      "case": "merger-cannot-forge-check",
+      "status": "passed",
+      "actor": "app:4873237",
+      "http": 403
+    },
+    {
+      "case": "developer-cannot-rewrite-workflow",
+      "status": "passed",
+      "http": 403,
+      "before": "b215ca57c5071c7a726f6bf034e201ac51009cd9",
+      "after": "b215ca57c5071c7a726f6bf034e201ac51009cd9"
+    },
+    {
+      "case": "merger-cannot-write-review",
+      "status": "passed",
+      "http": 403
+    },
+    {
+      "case": "independent-review-and-check",
+      "status": "passed",
+      "review_id": 5144032123,
+      "reviewer": "authority-proof-evaluator-20260908[bot]",
+      "reviewed_head": "b215ca57c5071c7a726f6bf034e201ac51009cd9",
+      "check": {
+        "check_id": 102134756818,
+        "sha": "b215ca57c5071c7a726f6bf034e201ac51009cd9",
+        "issuer": 15368,
+        "conclusion": "success",
+        "url": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/actions/runs/34247969411/job/102134756818"
+      },
+      "pull": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/pull/31"
+    },
+    {
+      "case": "developer-denial-has-current-human-approval-control",
+      "status": "passed",
+      "review_id": 5144032828,
+      "head": "b215ca57c5071c7a726f6bf034e201ac51009cd9"
+    },
+    {
+      "case": "developer-cannot-merge-otherwise-green-pr",
+      "status": "passed",
+      "actor": "app:4873210",
+      "http": 405,
+      "reason": "Repository rule violations found\n\nCannot update this protected ref.\n\n",
+      "before": "6f08b9214bfb670028e3302a66d925c92caa2a77",
+      "after": "6f08b9214bfb670028e3302a66d925c92caa2a77",
+      "pull": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/pull/31"
+    },
+    {
+      "case": "forged-evaluation-signature-rejected",
+      "status": "passed",
+      "reason": "Untrusted evaluation signature",
+      "mutation_requests": 0,
+      "before": "6f08b9214bfb670028e3302a66d925c92caa2a77",
+      "after": "6f08b9214bfb670028e3302a66d925c92caa2a77",
+      "pull": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/pull/31"
+    },
+    {
+      "case": "current-signed-evaluation-allowed",
+      "status": "passed"
+    },
+    {
+      "case": "changed-authority-hold-prevents-api-write",
+      "status": "passed",
+      "reason": "changed-policy",
+      "mutation_requests": 0,
+      "before": "6f08b9214bfb670028e3302a66d925c92caa2a77",
+      "after": "6f08b9214bfb670028e3302a66d925c92caa2a77",
+      "pull": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/pull/31"
+    },
+    {
+      "case": "changed-authority-revoked-prevents-api-write",
+      "status": "passed",
+      "reason": "changed-policy",
+      "mutation_requests": 0,
+      "before": "6f08b9214bfb670028e3302a66d925c92caa2a77",
+      "after": "6f08b9214bfb670028e3302a66d925c92caa2a77",
+      "pull": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/pull/31"
+    },
+    {
+      "case": "changed-live-issue-invalidates-evaluation",
+      "status": "passed",
+      "reason": "changed-request",
+      "mutation_requests": 0,
+      "before": "6f08b9214bfb670028e3302a66d925c92caa2a77",
+      "after": "6f08b9214bfb670028e3302a66d925c92caa2a77",
+      "pull": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/pull/31"
+    },
+    {
+      "case": "lost-merge-response-recovered-in-new-process",
+      "status": "passed",
+      "recovery": {
+        "merged": true,
+        "recovered": true,
+        "sha": "abb40c48ca0c89c20b2534330c990c457678ff6e",
+        "head_matches": true,
+        "mutation_count": 0
+      },
+      "pull": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/pull/31"
+    },
+    {
+      "case": "approval-branch-write",
+      "status": "passed",
+      "actor": "app:4873210",
+      "http": 200,
+      "branch": "proof/1788882984-approval"
+    },
+    {
+      "case": "l1-rejects-app-approval-instead-of-fixed-human",
+      "status": "passed",
+      "reason": "current-fixed-approver-required",
+      "mutation_requests": 0,
+      "before": "abb40c48ca0c89c20b2534330c990c457678ff6e",
+      "after": "abb40c48ca0c89c20b2534330c990c457678ff6e",
+      "pull": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/pull/32"
+    },
+    {
+      "case": "label-does-not-elevate-l1-authority",
+      "status": "passed",
+      "reason": "current-fixed-approver-required",
+      "mutation_requests": 0,
+      "before": "abb40c48ca0c89c20b2534330c990c457678ff6e",
+      "after": "abb40c48ca0c89c20b2534330c990c457678ff6e",
+      "pull": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/pull/32"
+    },
+    {
+      "case": "approval-fixture-update",
+      "status": "passed",
+      "http": 200
+    },
+    {
+      "case": "new-head-invalidates-old-signed-evaluation",
+      "status": "passed",
+      "reason": "changed-head",
+      "mutation_requests": 0,
+      "before": "abb40c48ca0c89c20b2534330c990c457678ff6e",
+      "after": "abb40c48ca0c89c20b2534330c990c457678ff6e",
+      "pull": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/pull/32"
+    },
+    {
+      "case": "l1-rejects-stale-human-approval",
+      "status": "passed",
+      "reason": "human-hold-or-revocation",
+      "mutation_requests": 0,
+      "before": "abb40c48ca0c89c20b2534330c990c457678ff6e",
+      "after": "abb40c48ca0c89c20b2534330c990c457678ff6e",
+      "pull": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/pull/32"
+    },
+    {
+      "case": "l1-accepts-current-fixed-human",
+      "status": "passed",
+      "review_id": 5144050526
+    },
+    {
+      "case": "approved-l1-merged",
+      "status": "passed",
+      "actor": "app:4873237",
+      "head": "7f8eef0ddfd4982e44c03e8c7576d60737f10026",
+      "merged_sha": "499a1e4f0502ed86f3d9041fd7a021edddaec6ea",
+      "pull": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/pull/32"
+    },
+    {
+      "case": "sql-branch-write",
+      "status": "passed",
+      "actor": "app:4873210",
+      "http": 200,
+      "branch": "proof/1788882984-sql"
+    },
+    {
+      "case": "sql-floor-not-bypassed-by-merger",
+      "status": "passed",
+      "actor": "app:4873237",
+      "http": 405,
+      "reason": "Repository rule violations found\n\nWaiting on code owner review from Sankaku-st.\n\n",
+      "before": "499a1e4f0502ed86f3d9041fd7a021edddaec6ea",
+      "after": "499a1e4f0502ed86f3d9041fd7a021edddaec6ea",
+      "pull": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/pull/33"
+    },
+    {
+      "case": "sql-floor-allows-fixed-owner-approval",
+      "status": "passed",
+      "actor": "app:4873237",
+      "head": "f72f71ca63e4923c4be23c02a4bb4462b3d17355",
+      "merged_sha": "4c160574d3625e5f527d28268764ffb5e3463d1a",
+      "pull": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/pull/33"
+    },
+    {
+      "case": "race-a-branch-write",
+      "status": "passed",
+      "actor": "app:4873210",
+      "http": 200,
+      "branch": "proof/1788882984-race-a"
+    },
+    {
+      "case": "race-b-branch-write",
+      "status": "passed",
+      "actor": "app:4873210",
+      "http": 200,
+      "branch": "proof/1788882984-race-b"
+    },
+    {
+      "case": "race-starts-from-same-base",
+      "status": "passed",
+      "base": "4c160574d3625e5f527d28268764ffb5e3463d1a"
+    },
+    {
+      "case": "first-concurrent-pr-merged",
+      "status": "passed",
+      "actor": "app:4873237",
+      "head": "d9434e22886f62023a02a399c005f3d87dc4592e",
+      "merged_sha": "289c5a0fa05db61936eb4e48fcbb323dc1cd395b",
+      "pull": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/pull/34"
+    },
+    {
+      "case": "stale-base-checks-cannot-merge-second-pr",
+      "status": "passed",
+      "actor": "app:4873237",
+      "http": 405,
+      "reason": "Repository rule violations found\n\nRequired status check \"proof-integration\" is expected.\n\n",
+      "before": "289c5a0fa05db61936eb4e48fcbb323dc1cd395b",
+      "after": "289c5a0fa05db61936eb4e48fcbb323dc1cd395b",
+      "pull": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/pull/35"
+    },
+    {
+      "case": "stale-branch-update-requested",
+      "status": "passed",
+      "http": 202,
+      "prior_checks": [
+        {
+          "check_id": 102135749416,
+          "sha": "d9434e22886f62023a02a399c005f3d87dc4592e",
+          "issuer": 15368,
+          "conclusion": "success",
+          "url": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/actions/runs/34248255584/job/102135749416"
+        },
+        {
+          "check_id": 102135778214,
+          "sha": "6f6e54508448ffc89a1108dd5151e608e5cc726a",
+          "issuer": 15368,
+          "conclusion": "success",
+          "url": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/actions/runs/34248264186/job/102135778214"
+        }
+      ]
+    },
+    {
+      "case": "second-pr-merged-after-current-base-check",
+      "status": "passed",
+      "actor": "app:4873237",
+      "head": "1b95a0900e2aedf3f9e1ef6247558c565d581bc8",
+      "merged_sha": "e6882cd47bab1fa1b643876420ffa8fe31bbd198",
+      "pull": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/pull/35"
+    },
+    {
+      "case": "broken-branch-write",
+      "status": "passed",
+      "actor": "app:4873210",
+      "http": 200,
+      "branch": "proof/1788882984-broken"
+    },
+    {
+      "case": "failed-ci-blocks-merger",
+      "status": "passed",
+      "actor": "app:4873237",
+      "http": 405,
+      "reason": "Repository rule violations found\n\nRequired status check \"proof-integration\" is failing.\n\n",
+      "before": "e6882cd47bab1fa1b643876420ffa8fe31bbd198",
+      "after": "e6882cd47bab1fa1b643876420ffa8fe31bbd198",
+      "pull": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/pull/36"
+    },
+    {
+      "case": "failed-fixture-repaired",
+      "status": "passed",
+      "http": 200,
+      "failed_check": {
+        "check_id": 102136390478,
+        "sha": "d371bab18fe3cc6973daacd28b32c831942422c0",
+        "issuer": 15368,
+        "conclusion": "failure",
+        "url": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/actions/runs/34248449624/job/102136390478"
+      }
+    },
+    {
+      "case": "repair-reviewed-at-new-head",
+      "status": "passed",
+      "check": {
+        "check_id": 102136532647,
+        "sha": "7c4f5ab381462a3664512b9283d12637bd2afba4",
+        "issuer": 15368,
+        "conclusion": "success",
+        "url": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/actions/runs/34248490105/job/102136532647"
+      },
+      "review_id": 5144087869
+    },
+    {
+      "case": "repaired-pr-merged",
+      "status": "passed",
+      "actor": "app:4873237",
+      "head": "7c4f5ab381462a3664512b9283d12637bd2afba4",
+      "merged_sha": "595db7d8f1f979c9d132bde9a65ba6fa814ed26f",
+      "pull": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/pull/36"
+    },
+    {
+      "case": "canceled-branch-write",
+      "status": "passed",
+      "actor": "app:4873210",
+      "http": 200,
+      "branch": "proof/1788882984-canceled"
+    },
+    {
+      "case": "developer-cannot-cancel-required-ci",
+      "status": "passed",
+      "http": 403,
+      "run_id": 34248552738
+    },
+    {
+      "case": "canceled-ci-blocks-merger",
+      "status": "passed",
+      "actor": "app:4873237",
+      "http": 405,
+      "reason": "Repository rule violations found\n\nRequired status check \"proof-integration\" is cancelled.\n\n",
+      "before": "595db7d8f1f979c9d132bde9a65ba6fa814ed26f",
+      "after": "595db7d8f1f979c9d132bde9a65ba6fa814ed26f",
+      "pull": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/pull/37"
+    },
+    {
+      "case": "cancellation-readback",
+      "status": "passed",
+      "check": {
+        "check_id": 102136747173,
+        "sha": "cfbe503d53807095d34311d10f0f8a53b8302edf",
+        "issuer": 15368,
+        "conclusion": "cancelled",
+        "url": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/actions/runs/34248552738/job/102136747173"
+      }
+    },
+    {
+      "case": "issuer-branch-write",
+      "status": "passed",
+      "actor": "app:4873210",
+      "http": 200,
+      "branch": "proof/1788882984-issuer"
+    },
+    {
+      "case": "same-named-success-from-different-issuer",
+      "status": "passed",
+      "status_id": 53750475877,
+      "creator_id": 274508574,
+      "head": "d51cfe19300ecdb3c3e24d1b8d37f7e21adda55b"
+    },
+    {
+      "case": "wrong-issuer-success-cannot-satisfy-required-check",
+      "status": "passed",
+      "actor": "app:4873237",
+      "http": 405,
+      "reason": "Repository rule violations found\n\nRequired status check \"proof-integration\" was not set by the expected GitHub app.\n\n",
+      "before": "595db7d8f1f979c9d132bde9a65ba6fa814ed26f",
+      "after": "595db7d8f1f979c9d132bde9a65ba6fa814ed26f",
+      "pull": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/pull/38"
+    },
+    {
+      "case": "issuer-recovery-creates-new-revision",
+      "status": "passed",
+      "http": 200
+    },
+    {
+      "case": "expired-execution-cannot-send-merge",
+      "status": "passed",
+      "old_generation": 74,
+      "current_generation": 75,
+      "mutation_requests": 0
+    },
+    {
+      "case": "replacement-merges-with-real-check-and-no-human-approval",
+      "status": "passed",
+      "check": {
+        "check_id": 102137160747,
+        "sha": "c1dd9602f89e45926071823b1006ba6ff716ff77",
+        "issuer": 15368,
+        "conclusion": "success",
+        "url": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/actions/runs/34248674552/job/102137160747"
+      },
+      "merged_sha": "f3f56b7ab2b3a79300b1e02c6964694617093677",
+      "pull": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/pull/38"
+    },
+    {
+      "case": "owner-branch-write",
+      "status": "passed",
+      "actor": "app:4873210",
+      "http": 200,
+      "branch": "proof/1788882984-owner"
+    },
+    {
+      "case": "owner-exception-uses-actual-owner-author",
+      "status": "passed"
+    },
+    {
+      "case": "owner-altered-merge-tree-denied",
+      "status": "passed",
+      "http": 422,
+      "reason": "Repository rule violations found\n\nChanges must be made through a pull request.\n\nRequired status check \"proof-integration\" is expected.\n\n",
+      "check": {
+        "sha": "c1e08dbc4ada5cf96b5d802c9685443ab9bb579f",
+        "check_id": 102137470920,
+        "issuer": 15368,
+        "conclusion": "success"
+      },
+      "before": "f3f56b7ab2b3a79300b1e02c6964694617093677",
+      "after": "f3f56b7ab2b3a79300b1e02c6964694617093677",
+      "pull": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/pull/39"
+    },
+    {
+      "case": "fixed-owner-self-merge-exception",
+      "status": "passed",
+      "head": "8f1a08771ded26039314fc55ca889ca64ca0f469",
+      "merged_sha": "d74f0413669336553fa17c2f87c7d63d2132ff20",
+      "check": {
+        "sha": "d74f0413669336553fa17c2f87c7d63d2132ff20",
+        "check_id": 102137557345,
+        "issuer": 15368,
+        "conclusion": "success"
+      },
+      "pull": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/pull/39"
+    },
+    {
+      "case": "owner-merge-preserves-noreply-author",
+      "status": "passed",
+      "author_is_noreply": true,
+      "committer_is_noreply": true
+    },
+    {
+      "case": "review-history-branch-write",
+      "status": "passed",
+      "actor": "app:4873210",
+      "http": 200,
+      "branch": "proof/1788882984-review-history"
+    },
+    {
+      "case": "human-comment-does-not-clear-change-request",
+      "status": "passed",
+      "reason": "human-hold-or-revocation",
+      "mutation_requests": 0,
+      "before": "d74f0413669336553fa17c2f87c7d63d2132ff20",
+      "after": "d74f0413669336553fa17c2f87c7d63d2132ff20",
+      "pull": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/pull/40"
+    },
+    {
+      "case": "evaluator-comment-does-not-clear-change-request",
+      "status": "passed",
+      "reason": "current-evaluator-review-required",
+      "mutation_requests": 0,
+      "before": "d74f0413669336553fa17c2f87c7d63d2132ff20",
+      "after": "d74f0413669336553fa17c2f87c7d63d2132ff20",
+      "pull": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/pull/40"
+    },
+    {
+      "case": "formal-approvals-resolve-change-requests",
+      "status": "passed",
+      "actor": "app:4873237",
+      "head": "99f191fde9f50b5466e0fdfb55f741ce3d1881ce",
+      "merged_sha": "488fc7b0e6b541e813d1753a9dc754f95de7cba0",
+      "pull": "https://github.com/Sankaku-st/twinchat-authority-proof-20260908-02/pull/40"
+    }
+  ],
+  "quality_criteria": {
+    "behavior": "passed",
+    "changeability": "passed",
+    "contracts": "passed",
+    "operations": "passed",
+    "provenance": "passed",
+    "recovery": "passed",
+    "tests": "passed",
+    "understanding": "passed"
+  }
+}
