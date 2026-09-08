@@ -1,3 +1,3 @@
 # Synthetic approval fixture
 
-New revision.
+Synthetic run: 1788880025.
