@@ -1,3 +1,2 @@
-"""Synthetic invariant exercised by GitHub Actions."""
-
+"""Repaired synthetic invariant."""
 VALUE = 1
