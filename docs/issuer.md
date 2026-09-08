@@ -1,3 +1,3 @@
-# Synthetic issuer fixture
+# Clean issuer revision
 
-Synthetic run: 1788882984.
+Run 1788882984.
