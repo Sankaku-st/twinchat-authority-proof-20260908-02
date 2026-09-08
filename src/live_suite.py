@@ -94,6 +94,10 @@ class Suite:
 
     def pull(self, suffix, path, content, author=None):
         branch = f"proof/{self.run_id}-{suffix}"
+        if path.endswith(".md"):
+            content += f"\nSynthetic run: {self.run_id}.\n"
+        elif path.endswith(".sql"):
+            content += f"\n-- Synthetic run: {self.run_id}.\n"
         base = self.dev.head()
         self.dev.branch(branch, base)
         written = self.dev.write(branch, path, content, f"test: synthetic {suffix}; Refs #1")
@@ -111,6 +115,14 @@ class Suite:
             "commit_id": self.dev.pull(pull["number"])["head"]["sha"],
             "event": event, "body": "Synthetic fixture review: " + event,
         })
+
+    def wait_written_head(self, pull, response):
+        deadline = time.monotonic() + 60
+        expected = response.data["commit"]["sha"]
+        while self.dev.pull(pull["number"])["head"]["sha"] != expected:
+            if time.monotonic() > deadline:
+                raise TimeoutError("Written fixture head was not visible on the PR")
+            time.sleep(2)
 
     def live(self, pull):
         return self.service.snapshot(pull["number"], self.authorities[pull["number"]])
@@ -255,8 +267,11 @@ class Suite:
         self.dev.require("POST", f"/issues/{pull['number']}/labels", {"labels": ["auto-merge"]})
         self.blocked_service("label-does-not-elevate-l1-authority", pull, payload, signature, ("current-fixed-approver-required",))
         human = self.review(pull, self.owner)
-        written = self.dev.write(pull["branch"], "docs/approval.md", "# Synthetic approval fixture\n\nNew revision.\n", "test: invalidate old approval; Refs #1")
+        written = self.dev.write(pull["branch"], "docs/approval.md", f"# Synthetic approval fixture\n\nNew revision for {self.run_id}.\n", "test: invalidate old approval; Refs #1")
         self.record("approval-fixture-update", written.status == 200, http=written.status)
+        # Content writes and PR metadata become visible separately. Compare the
+        # old verdict only after the PR exposes the exact newly written commit.
+        self.wait_written_head(pull, written)
         self.blocked_service("new-head-invalidates-old-signed-evaluation", pull, payload, signature, ("changed-head",))
         self.dev.wait_check(pull["number"])
         self.review(pull)
@@ -300,8 +315,9 @@ class Suite:
         failed_check = self.dev.wait_check(broken["number"], expected="failure")
         self.deny_merge("failed-ci-blocks-merger", broken, expected_reasons=("status check", "checks must", "check failed"))
         self.review(broken, event="REQUEST_CHANGES")
-        repaired = self.dev.write(broken["branch"], "fixtures/value.py", '"""Repaired synthetic invariant."""\nVALUE = 1\n', "test: repair fixture; Refs #1")
+        repaired = self.dev.write(broken["branch"], "fixtures/value.py", f'"""Repaired synthetic invariant, run {self.run_id}."""\nVALUE = 1\n', "test: repair fixture; Refs #1")
         self.record("failed-fixture-repaired", repaired.status == 200, http=repaired.status, failed_check=failed_check)
+        self.wait_written_head(broken, repaired)
         current = self.dev.wait_check(broken["number"])
         review = self.review(broken)
         self.record("repair-reviewed-at-new-head", review["commit_id"] != broken["head"] and review["state"] == "APPROVED", check=current, review_id=review["id"])
@@ -347,8 +363,13 @@ class Suite:
                             expected_reasons=("expected github app", "status check", "checks must"))
         finally:
             self.owner.require("PUT", f"/actions/workflows/{workflow['id']}/enable")
-        self.owner.require("POST", f"/actions/workflows/{workflow['id']}/dispatches", {"ref": pull["branch"]})
+        # GitHub retains the wrong-issuer status on that SHA. Recover on a new
+        # revision, with a new genuine check and a new independent evaluation.
+        written = self.dev.write(pull["branch"], "docs/issuer.md", f"# Clean issuer revision\n\nRun {self.run_id}.\n", "test: reevaluate clean revision; Refs #1")
+        self.record("issuer-recovery-creates-new-revision", written.status == 200 and written.data["commit"]["sha"] != pull["head"], http=written.status)
+        self.wait_written_head(pull, written)
         check = self.dev.wait_check(pull["number"])
+        self.review(pull, event="COMMENT")
         _, payload, signature = self.signed(self.live(pull))
         issue = "1"
         old = self.claims.claim(issue, "expired", ttl=0)
@@ -398,6 +419,22 @@ class Suite:
                     author_is_noreply=result["mergeCommit"]["author"]["email"].endswith("@users.noreply.github.com"),
                     committer_is_noreply="noreply" in result["mergeCommit"]["committer"]["email"])
 
+    def comments_preserve_change_requests(self):
+        pull = self.pull("review-history", "docs/review-history.md", "# Review state fixture\n")
+        self.dev.wait_check(pull["number"])
+        self.review(pull)
+        self.review(pull, self.owner, event="REQUEST_CHANGES")
+        self.review(pull, self.owner, event="COMMENT")
+        _, payload, signature = self.signed(self.live(pull))
+        self.blocked_service("human-comment-does-not-clear-change-request", pull, payload, signature, ("human-hold-or-revocation",))
+        self.review(pull, self.owner)
+        self.review(pull, event="REQUEST_CHANGES")
+        self.review(pull, event="COMMENT")
+        _, payload, signature = self.signed(self.live(pull))
+        self.blocked_service("evaluator-comment-does-not-clear-change-request", pull, payload, signature, ("current-evaluator-review-required",))
+        self.review(pull)
+        self.merge("formal-approvals-resolve-change-requests", pull)
+
     def run(self):
         try:
             self.permissions_and_lost_response()
@@ -406,6 +443,7 @@ class Suite:
             self.canceled_check()
             self.expected_issuer_and_fencing()
             self.fixed_owner_exception()
+            self.comments_preserve_change_requests()
         finally:
             self.save()
 
