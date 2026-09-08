@@ -1,1 +1,2 @@
-VALUE = 2
+"""Repaired synthetic invariant."""
+VALUE = 1
