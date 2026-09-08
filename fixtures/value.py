@@ -1,3 +1,1 @@
-"""Synthetic invariant exercised by GitHub Actions."""
-
-VALUE = 1
+VALUE = 2
