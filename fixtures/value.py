@@ -1,2 +1,3 @@
-"""Repaired synthetic invariant, run 1788880551."""
+import time
+time.sleep(30)
 VALUE = 1
